@@ -1,0 +1,22 @@
+{
+  "id": "nodebb-plugin-modmin",
+  "name": "Modmin",
+  "description": "Allow mods to manage category privileges.",
+  "url": "",
+  "library": "library.js",
+  "less": [
+    "public/less/style.less"
+  ],
+  "scripts": [
+    "public/js/modmin.js"
+  ],
+  "hooks": [
+    { "hook": "static:app.load",                     "method": "load" },
+    { "hook": "filter:privileges.list",              "method": "addPrivileges" },
+    { "hook": "filter:privileges.list_human",        "method": "addPrivilegesHuman" },
+    { "hook": "filter:privileges.global.list",       "method": "addGlobalPrivileges" },
+    { "hook": "filter:privileges.global.list_human", "method": "addGlobalPrivilegesHuman" }
+  ],
+  "templates": "public/templates",
+  "languages": "public/language"
+}

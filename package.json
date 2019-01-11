@@ -1,0 +1,22 @@
+{
+  "name": "nodebb-plugin-modmin",
+  "version": "1.0.0",
+  "author": {
+    "name": "yariplus",
+    "email": "tafike@gmail.com"
+  },
+  "homepage": "https://github.com/yariplus/nodebb-plugin-modmin",
+  "bugs": {
+    "url": "https://github.com/yariplus/nodebb-plugin-modmin/issues"
+  },
+  "keywords": [
+    "nodebb",
+    "plugin",
+    "moderate",
+    "moderator",
+    "admin"
+  ],
+  "nbbpm": {
+    "compatibility": "^1.0.0"
+  }
+}
