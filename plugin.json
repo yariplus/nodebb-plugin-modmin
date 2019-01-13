@@ -22,6 +22,5 @@
     { "hook": "filter:privileges.global.groups.list_human", "method": "addPrivilegesHuman" },
     { "hook": "filter:categories.copyPrivilegesFrom",       "method": "copyPrivilegesFrom" }
   ],
-  "templates": "public/templates",
-  "languages": "public/language"
+  "templates": "public/templates"
 }
