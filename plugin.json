@@ -11,11 +11,16 @@
     "public/js/modmin.js"
   ],
   "hooks": [
-    { "hook": "static:app.load",                     "method": "load" },
-    { "hook": "filter:privileges.list",              "method": "addPrivileges" },
-    { "hook": "filter:privileges.list_human",        "method": "addPrivilegesHuman" },
-    { "hook": "filter:privileges.global.list",       "method": "addGlobalPrivileges" },
-    { "hook": "filter:privileges.global.list_human", "method": "addGlobalPrivilegesHuman" }
+    { "hook": "static:app.load",                            "method": "load" },
+    { "hook": "filter:privileges.list",                     "method": "addPrivileges" },
+    { "hook": "filter:privileges.list_human",               "method": "addPrivilegesHuman" },
+    { "hook": "filter:privileges.global.list",              "method": "addPrivileges" },
+    { "hook": "filter:privileges.global.list_human",        "method": "addPrivilegesHuman" },
+    { "hook": "filter:privileges.groups.list",              "method": "addPrivilegesGroups" },
+    { "hook": "filter:privileges.groups.list_human",        "method": "addPrivilegesHuman" },
+    { "hook": "filter:privileges.global.groups.list",       "method": "addPrivilegesGroups" },
+    { "hook": "filter:privileges.global.groups.list_human", "method": "addPrivilegesHuman" },
+    { "hook": "filter:categories.copyPrivilegesFrom",       "method": "copyPrivilegesFrom" }
   ],
   "templates": "public/templates",
   "languages": "public/language"

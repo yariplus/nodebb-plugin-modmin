@@ -1,0 +1,23 @@
+.ui-front.ui-autocomplete {
+  z-index: 100002;
+}
+
+#category-color[type="color"], #category-bgColor[type="color"] {
+  padding: 0;
+}
+
+#modmin {
+  &[data-cid="0"] {
+    .privilege-table-container {
+      display: none;
+    }
+
+    [data-action="editCategory"] {
+      display: none;
+    }
+  }
+
+  .privilege-table:nth-child(2), .privilege-table-header, .help-block {
+    display: none;
+  }
+}
