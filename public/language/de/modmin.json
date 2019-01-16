@@ -1,0 +1,17 @@
+{
+  "title": "Manage Category",
+  "intro": "You can configure the privileges and settings for categories on this page. Privileges can be granted on a per-user or a per-group basis. Select the category from the dropdown below.",
+  "edit_category": "Edit Category",
+  "new_subcategory": "Create Subcategory",
+  "category_icon": "Category Icon",
+  "assign_group": "Assign Group <small>Will make the category only accessable by this group.</small>",
+  "show_badge": "Show Badge <small>Badge setting for assigned group.</small>",
+  "assign_owner": "Assign Owner <small>If a user is selected, they will become a manager of the category and group.</small>",
+  "category_edited": "Category Edited!",
+  "subcategory_added": "Subcategory Added!",
+  "group_created": "Group created!",
+  "error_data": "Error retrieving category data.",
+  "privileges_copied": "Privileges copied!",
+  "invalid_owner": "Invalid Owner",
+  "group_exists": "Group already exists."
+}

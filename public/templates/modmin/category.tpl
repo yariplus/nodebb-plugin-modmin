@@ -1,11 +1,9 @@
 <div class="row" id="modmin" data-cid="{cid}">
-  <div class="h2">Manage Categories</div>
+  <div class="h2">[[modmin:title]]</div>
 
 	<form role="form" class="category">
 		<div>
-			<p>
-				You can configure the privileges and settings for categories on this page. Privileges can be granted on a per-user or a per-group basis. Select the category from the dropdown below.
-			</p>
+			<p>[[modmin:intro]]</p>
 
 			<div class="lead">
 				Configuring settings for
@@ -16,10 +14,10 @@
 
       <div class="btn-toolbar">
         <button type="button" class="btn btn-info" data-ajaxify="false" data-action="editCategory">
-          Edit Category
+          [[modmin:edit_category]]
         </button>
         <button type="button" class="btn btn-primary" data-ajaxify="false" data-action="addSubcategory" data-isGroupAssigner="{isGroupAssigner}">
-          Create Subcategory
+          [[modmin:new_subcategory]]
         </button>
       </div>
 

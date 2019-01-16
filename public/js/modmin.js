@@ -179,7 +179,7 @@ define('forum/modmin/category', [
   Modmin.copyPrivilegesToChildren = function () {
     socket.emit('plugins.modmin.categories.copyPrivilegesToChildren', {cid: cid}, function (err) {
       if (err) return app.alertError(err.message)
-      app.alertSuccess('Privileges copied!')
+      app.alertSuccess('[[modmin:privileges_copied]]')
     })
   }
 
@@ -195,25 +195,30 @@ define('forum/modmin/category', [
   }
 
   Modmin.addSubcategory = function () {
-    let modal = showCategoryModal('Add Subcategory', 'addSubcategory', function (err, cid) {
-      if (err) {
-        return app.alertError(err.message)
-      }
-      app.alertSuccess('Subcategory added!')
-      ajaxify.refresh()
-    })
+    Benchpress.parse('modmin/edit_category', {
+      addSubcategory: true,
+      isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
+    }, function (html) {
+      translator.translate(html, function (html) {
+        let modal = showCategoryModal('[[modmin:new_subcategory]]', 'addSubcategory', html, function (err, cid) {
+          if (err) return app.alertError(err.message)
+          app.alertSuccess('[[modmin:subcategory_added]]')
+          ajaxify.refresh()
+        })
 
-    modal.on('shown.bs.modal', function () {
-      modal.find('#category-color').val('#ec0000')
-      modal.find('#category-bgColor').val('#ffffff')
-      modal.find('#category-group').prop('checked', true)
-      modal.find('#category-badge').prop('checked', true)
+        modal.on('shown.bs.modal', function () {
+          modal.find('#category-color').val('#ec0000')
+          modal.find('#category-bgColor').val('#ffffff')
+          modal.find('#category-group').prop('checked', true)
+          modal.find('#category-badge').prop('checked', true)
 
-      autocomplete.user(modal.find('#category-owner'))
-      modal.find('#category-icon i').addClass('fa-group')
-      .prop('value', 'fa-group')
-      modal.find('#category-icon').click(() => {
-        iconSelect.init($(this).find('i'), (el) => {})
+          autocomplete.user(modal.find('#category-owner'))
+          modal.find('#category-icon i').addClass('fa-group')
+          .prop('value', 'fa-group')
+          modal.find('#category-icon').click(() => {
+            iconSelect.init($(this).find('i'), (el) => {})
+          })
+        })
       })
     })
   }
@@ -222,88 +227,36 @@ define('forum/modmin/category', [
     if (!cid) return
 
     $.get(config.relative_path + '/api/category/' + cid, function (data) {
-      if (!data) return app.alertError('Error retrieving category data.')
+      if (!data) return app.alertError('[[modmin:error_data]]')
 
-      let modal = showCategoryModal('Edit Category', 'editCategory', function (err) {
-        if (err) {
-          return app.alertError(err.message)
-        }
-        app.alertSuccess('Category edited!')
-      })
+      Benchpress.parse('modmin/edit_category', {
+        addSubcategory: true,
+        isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
+      }, function (html) {
+        let modal = showCategoryModal('[[modmin:edit_category]]', 'editCategory', html, function (err) {
+          if (err) return app.alertError(err.message)
+          app.alertSuccess('[[modmin:category_edited]]')
+        })
 
-      modal.on('shown.bs.modal', function () {
-        modal.find('#category-name').val($($.parseHTML(data.name)[0]).text())
-        modal.find('#category-description').val($($.parseHTML(data.description)[0]).text())
-        modal.find('#category-color').val(data.color)
-        modal.find('#category-bgColor').val(data.bgColor)
-        modal.find('#category-icon i').addClass(data.icon)
-        modal.find('#category-icon i').val(data.icon)
-        modal.find('#category-icon').click(() => {
-          iconSelect.init($(this).find('i'), (el) => {})
+        modal.on('shown.bs.modal', function () {
+          modal.find('#category-name').val($($.parseHTML(data.name)[0]).text())
+          modal.find('#category-description').val($($.parseHTML(data.description)[0]).text())
+          modal.find('#category-color').val(data.color)
+          modal.find('#category-bgColor').val(data.bgColor)
+          modal.find('#category-icon i').addClass(data.icon)
+          modal.find('#category-icon i').val(data.icon)
+          modal.find('#category-icon').click(() => {
+            iconSelect.init($(this).find('i'), (el) => {})
+          })
         })
       })
     })
   }
 
-  function showCategoryModal (title, event, callback) {
+  function showCategoryModal (title, event, html, callback) {
     let modal = bootbox.confirm({
       title: title,
-      message: `
-      <form class="form" id="category-modal">
-        <div class="row">
-          <div class="col-sm-6 col-xs-12">
-            <label for="category-name">Category Name</label>
-            <input id="category-name" type="text" class="form-control" placeholder="" data-name="name" value="" /><br />
-          </div>
-          <div class="col-sm-6 col-xs-12">
-            <label for="category-description">Category Description</label>
-            <input id="category-description" type="text" class="form-control category_description description" data-name="description" placeholder="" value="" /><br />
-          </div>
-          <div class="col-sm-6 col-xs-12">
-            <div class="form-group">
-              <label for="category-bgColor">Background Color</label>
-              <input id="category-bgColor" type="color" data-name="bgColor" class="form-control category_bgColor" />
-            </div>
-          </div>
-          <div class="col-sm-6 col-xs-12">
-            <div class="form-group">
-              <label for="category-color">Text Color</label>
-              <input id="category-color" type="color" data-name="color" class="form-control category_color" />
-            </div>
-          </div>
-          <div class="col-sm-6 col-xs-12">
-            <div class="form-group">
-              <label for="category-icon">Category Icon</label>
-              <div id="category-icon" class="btn btn-default" style="display:block;">
-                <i class="fa fa-fw"></i>
-              </div>
-            </div>
-          </div>
-      ` + (event === 'addSubcategory' ? ($('[data-isGroupAssigner="true"]').length ? `
-          <div class="col-sm-6 col-xs-12">
-            <div class="checkbox">
-              <label for="category-group">
-                <input id="category-group" type="checkbox"> Assign Group <small>Will make the category only accessable by this group.</small>
-              </label>
-            </div>
-          </div>
-          <div class="col-sm-6 col-xs-12">
-            <div class="checkbox">
-              <label for="category-badge">
-                <input id="category-badge" type="checkbox"> Show Badge <small>Badge setting for assigned group.</small>
-              </label>
-            </div>
-          </div>
-          ` : '') + `
-          <div class="col-sm-6 col-xs-12">
-            <div class="form-group">
-              <label for="category-owner">
-                Assign Owner
-                <small>If a user is selected, they will become a manager of the category and group.</small>
-              </label>
-              <input id="category-owner" type="text" placeholder="" data-name="color" class="form-control category_color" />
-            </div>
-          </div>` : '') + '</div></form>',
+      message: html,
       confirm: {
         label: 'Confirm',
         className: 'btn-success',
@@ -328,14 +281,14 @@ define('forum/modmin/category', [
         if (owner) {
           $.get(config.relative_path + '/api/user/' + owner)
           .done(function (data, status) {
-            if (status !== 'success') return app.alertError('Invalid Owner')
+            if (status !== 'success') return app.alertError('[[modmin:invalid_owner]]')
             owner = parseInt(data.uid, 10)
-            if (!owner) return app.alertError('Invalid Owner')
+            if (!owner) return app.alertError('[[modmin:invalid_owner]]')
 
             if (group) {
               $.get(config.relative_path + '/api/groups/' + name)
               .done(function (data, status) {
-                if (data.slug) return app.alertError('Group already exists.')
+                if (data.slug) return app.alertError('[[modmin:group_exists]]')
                 done()
               })
               .fail(function () {
@@ -346,7 +299,7 @@ define('forum/modmin/category', [
             }
           })
           .fail(function () {
-            app.alertError('Invalid Owner')
+            app.alertError('[[modmin:invalid_owner]]')
           })
         } else {
           done()
@@ -382,7 +335,7 @@ define('forum/modmin/category', [
         if (err) {
           app.alertError(err.message)
         } else {
-          app.alertSuccess('Group created!')
+          app.alertSuccess('[[modmin:group_created]]')
           ajaxify.refresh()
         }
       })
