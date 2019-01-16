@@ -236,6 +236,7 @@ define('forum/modmin/category', [
         let modal = showCategoryModal('[[modmin:edit_category]]', 'editCategory', html, function (err) {
           if (err) return app.alertError(err.message)
           app.alertSuccess('[[modmin:category_edited]]')
+          ajaxify.refresh()
         })
 
         modal.on('shown.bs.modal', function () {

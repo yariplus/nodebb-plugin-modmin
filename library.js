@@ -6,6 +6,7 @@ const User = require.main.require('./src/user')
 const Privileges = require.main.require('./src/privileges')
 const Helpers = require.main.require('./src/privileges/helpers')
 const Categories = require.main.require('./src/categories')
+const Database = require.main.require('./src/database')
 const Groups = require.main.require('./src/groups')
 const Events = require.main.require('./src/events')
 const SocketPlugins = require.main.require('./src/socket.io/plugins')
@@ -332,7 +333,8 @@ exports.load = function ({ app, middleware, router }, next) {
               async.apply(Groups.create, {name: group, ownerUid: owner || uid, userTitleEnabled}),
               async.apply(Privileges.categories.give, defaultPrivileges, [category.cid], [group]),
               async.apply(Privileges.categories.rescind, defaultPrivileges, [category.cid], ['registered-users', 'guests', 'spiders']),
-            ], err => next(err))
+              async.apply(Database.setObjectField, 'modmin:cid:group', `${category.cid}`, group),
+            ], (err) => next(err))
           })
         }
       },
@@ -393,6 +395,41 @@ exports.copyPrivilegesFrom = (data, next) => {
   data.privileges.push('modmin')
   data.privileges.push('assigngroups')
   next(null, data)
+}
+
+exports.categoryUpdate = (data) => {
+  if (!data.modified.name) return
+
+  Database.getObjectField('modmin:cid:group', `${data.cid}`, (err, group) => {
+    if (err || !group) return
+
+    async.parallel([
+      async.apply(Groups.renameGroup, group, data.modified.name),
+      async.apply(Database.setObjectField, 'modmin:cid:group', `${data.cid}`, data.modified.name),
+    ], err => {
+      if (err) console.log('Error renaming assigned group: ' + group)
+    })
+  })
+}
+
+exports.groupRename = (data) => {
+  Database.getObject('modmin:cid:group', (err, object) => {
+    if (err || !object) return
+
+    let fields = Object.keys(object)
+    let values = Object.values(object)
+
+    let i = values.indexOf(data.old)
+
+    if (i === -1) return
+
+    async.parallel([
+      async.apply(Categories.update, {[fields[i]]: {name: data.new}}),
+      async.apply(Database.setObjectField, 'modmin:cid:group', `${fields[i]}`, data.new),
+    ], err => {
+      if (err) console.log('Error renaming assigned cid: ' + fields[i])
+    })
+  })
 }
 
 function socketMethod (method) {
