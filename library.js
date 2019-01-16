@@ -451,9 +451,6 @@ function isAdminOrModmin (cid, uid, callback) {
     isModmin(next) {
       Helpers.isUserAllowedTo('modmin', uid, [cid], (err, isAllowed) => next(err, isAllowed ? isAllowed[0] : false))
     },
-    isGmod(next) {
-      Helpers.isUserAllowedTo('modmin', 'Global Moderators', [cid], next)
-    },
   }, (err, results) => {
     callback(err, err ? false : results.isAdmin || results.isModmin)
   })
