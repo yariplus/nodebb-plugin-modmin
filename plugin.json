@@ -22,7 +22,8 @@
     { "hook": "filter:privileges.global.groups.list_human", "method": "addPrivilegesHuman" },
     { "hook": "filter:categories.copyPrivilegesFrom",       "method": "copyPrivilegesFrom" },
     { "hook": "action:group.rename",                        "method": "groupRename" },
-    { "hook": "action:category.update",                     "method": "categoryUpdate" }
+    { "hook": "action:category.update",                     "method": "categoryUpdate" },
+    { "hook": "filter:admin.header.build",                  "method": "adminHeader" }
   ],
   "templates": "public/templates",
   "languages": "public/language"

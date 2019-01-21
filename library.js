@@ -10,6 +10,8 @@ const Database = require.main.require('./src/database')
 const Groups = require.main.require('./src/groups')
 const Events = require.main.require('./src/events')
 const SocketPlugins = require.main.require('./src/socket.io/plugins')
+const SocketAdmin = require.main.require('./src/socket.io/admin')
+const Settings = require.main.require('./src/settings')
 
 const defaultPrivileges = [
   'find',
@@ -26,7 +28,19 @@ const defaultPrivileges = [
   'topics:delete',
 ]
 
+let settings
+
 exports.load = function ({ app, middleware, router }, next) {
+  settings = new Settings('modmin', '1.0.0', {}, loadSettings)
+
+  function loadSettings () {
+    // DEBUG
+    // console.dir(settings.get())
+  }
+
+  SocketAdmin.settings.syncModmin = function () {
+    settings.sync(loadSettings)
+  }
 
   // Render the modmin page if the user has the "Manage Category" permission anywhere.
   function render (req, res, next) {
@@ -79,7 +93,7 @@ exports.load = function ({ app, middleware, router }, next) {
               categories: function (next) {
                 async.waterfall([
                   function (next) {
-                    Categories.getCategories(cids, uid, next)
+                    Categories.getCategoriesData(cids, next)
                   },
                   function (categoriesData, next) {
                     categoriesData = Categories.getTree(categoriesData)
@@ -107,16 +121,20 @@ exports.load = function ({ app, middleware, router }, next) {
               }
             })
 
-            data.privileges.labels.users = [
-              {name: "[[admin/manage/privileges:moderate]]"},
-              {name:	"Manage Category"},
-            ]
-
-            Object.keys(data.privileges.users).forEach(uid => {
-              data.privileges.users[uid].privileges = {
-                moderate: data.privileges.users[uid].privileges.moderate,
-                modmin: data.privileges.users[uid].privileges.modmin,
+            Privileges.userPrivilegeList.slice().reverse().forEach((priv, i) => {
+              if (priv === 'moderate') return
+              if (!settings.get(priv)) {
+                data.privileges.labels.users.splice(Privileges.userPrivilegeList.indexOf(priv), 1)
+                Object.keys(data.privileges.users).forEach(uid => {
+                  delete data.privileges.users[uid].privileges[priv]
+                })
               }
+            })
+
+            // Assign groups is admin only.
+            data.privileges.labels.users.splice(data.privileges.labels.users.indexOf('assigngroups'), 1)
+            Object.keys(data.privileges.users).forEach(uid => {
+              delete data.privileges.users[uid].privileges['assigngroups']
             })
 
             res.render('modmin/category', {
@@ -133,6 +151,22 @@ exports.load = function ({ app, middleware, router }, next) {
     ])
   }
 
+  // Config page.
+  function renderConfig (req, res, next) {
+    let userPrivileges = Privileges.userPrivilegeList.slice()
+    let userPrivilegesLabels = Privileges.privilegeLabels.slice()
+
+    userPrivileges.pop()
+    userPrivilegesLabels.pop()
+
+    res.render('modmin/config', {
+      userPrivileges,
+      userPrivilegesLabels,
+      groupPrivilegeList: {},
+      groupPrivilegeListLabels: {},
+    })
+  }
+
   // All possible routes.
   router.get('/modmin', middleware.buildHeader, render)
   router.get('/api/modmin', render)
@@ -141,7 +175,8 @@ exports.load = function ({ app, middleware, router }, next) {
   router.get('/modmin/category/:cid', middleware.buildHeader, render)
   router.get('/api/modmin/category/:cid', render)
   router.get('/modmin/category/:cid/:slug', middleware.buildHeader, render)
-  router.get('/api/modmin/category/:cid/:slug', render)
+  router.get('/api/admin/plugins/modmin', renderConfig)
+  router.get('/admin/plugins/modmin', middleware.admin.buildHeader, renderConfig)
 
   SocketPlugins.modmin = { categories: {} }
 
@@ -155,16 +190,20 @@ exports.load = function ({ app, middleware, router }, next) {
         }
       },
       (privileges, next) => {
-        privileges.labels.users = [
-          {name: "[[admin/manage/privileges:moderate]]"},
-          {name:	"Manage Category"},
-        ]
-
-        Object.keys(privileges.users).forEach(uid => {
-          privileges.users[uid].privileges = {
-            moderate: privileges.users[uid].privileges.moderate,
-            modmin: privileges.users[uid].privileges.modmin,
+        Privileges.userPrivilegeList.slice().reverse().forEach((priv, i) => {
+          if (priv === 'moderate') return
+          if (!settings.get(priv)) {
+            privileges.labels.users.splice(Privileges.userPrivilegeList.indexOf(priv), 1)
+            Object.keys(privileges.users).forEach(uid => {
+              delete privileges.users[uid].privileges[priv]
+            })
           }
+        })
+
+        // Assign groups is admin only.
+        privileges.labels.users.splice(privileges.labels.users.indexOf('assigngroups'), 1)
+        Object.keys(privileges.users).forEach(uid => {
+          delete privileges.users[uid].privileges['assigngroups']
         })
 
         next(null, privileges)
@@ -188,7 +227,8 @@ exports.load = function ({ app, middleware, router }, next) {
       if (!data.set) return next(new Error('[[error:not-authorized]]'))
 
       async.each(data.privilege, function (privilege, next) {
-        if (!(privilege === 'modmin' ||
+        if (!(settings.get(privilege) || 
+              privilege === 'modmin' ||
               privilege === 'moderate')) return next()
 
         if (privilege === 'modmin' && uid === parseInt(data.member,10)) {
@@ -203,7 +243,7 @@ exports.load = function ({ app, middleware, router }, next) {
       }, onSetComplete)
     } else {
       // Only allow modmin and moderate changes.
-      if (!(data.privilege === 'modmin' || data.privilege === 'moderate')) return callback(new Error('[[error:not-authorized]]'))
+      if (!(settings.get(data.privilege) || data.privilege === 'modmin' || data.privilege === 'moderate')) return callback(new Error('[[error:not-authorized]]'))
 
       if (data.privilege === 'modmin' && uid === parseInt(data.member,10)) {
         return callback(new Error(`Can't revoke your own Manage privilege.`))
@@ -351,22 +391,38 @@ exports.load = function ({ app, middleware, router }, next) {
     Categories.update(modified, callback)
   })
 
+  // Make user the owner and create is not already created.
   SocketPlugins.modmin.categories.addGroup = socketMethod((socket, data, callback) => {
-    const {cid, name} = data
+    const {cid} = data
     const {uid} = socket
 
-    Groups.create({
-      name,
-      ownerUid: uid
-    }, (err, group) => {
+    isAdminOrGroupAssigner(cid, uid, (err, isGroupAssigner) => {
       if (err) return callback(err)
+      if (!isGroupAssigner) return callback(new Error('[[error:not-authorized]]'))
 
-      SocketPlugins.modmin.categories.setPrivilege({uid}, {
-        cid: cid,
-        privilege: ['groups:find', 'groups:read', 'groups:topics:read'],
-        set: true,
-        member: group.name,
-      }, callback)
+      let group
+
+      async.waterfall([
+        (next) => {
+          Categories.getCategoryField(cid, 'name', next)
+        },
+        (_name, next) => {
+          group = _name
+          Groups.exists(group, next)
+        },
+        (exists, next) => {
+          if (exists) {
+            Groups.ownership.grant(uid, group, next)
+          } else {
+            async.parallel([
+              async.apply(Groups.create, {name: group, ownerUid: uid}),
+              async.apply(Privileges.categories.give, defaultPrivileges, [cid], [group]),
+              async.apply(Privileges.categories.rescind, defaultPrivileges, [cid], ['registered-users', 'guests', 'spiders']),
+              async.apply(Database.setObjectField, 'modmin:cid:group', `${cid}`, group),
+            ], (err) => next(err))
+          }
+        },
+      ], callback)
     })
   })
 
@@ -430,6 +486,16 @@ exports.groupRename = (data) => {
       if (err) console.log('Error renaming assigned cid: ' + fields[i])
     })
   })
+}
+
+exports.adminHeader = (data, callback) => {
+  data.plugins.push({
+    'route': '/plugins/modmin',
+    'icon': '',
+    'name': 'Modmin'
+  })
+
+  callback(null, data)
 }
 
 function socketMethod (method) {

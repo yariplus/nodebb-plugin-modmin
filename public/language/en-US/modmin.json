@@ -13,5 +13,9 @@
   "error_data": "Error retrieving category data.",
   "privileges_copied": "Privileges copied!",
   "invalid_owner": "Invalid Owner",
-  "group_exists": "Group already exists."
+  "group_exists": "Group already exists.",
+  "config_title": "Modmin Settings",
+  "config_intro": "Select which privileges Category Managers can edit.",
+  "become_group_owner": "Become Group Owner",
+  "group_owned": "You are now the group owner!"
 }

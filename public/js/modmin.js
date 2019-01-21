@@ -24,6 +24,33 @@ define('forum/modmin/category', [
   }
 
   Modmin.setupPrivilegeTable = function () {
+    handlePrivChanges()
+
+    $('[data-action="addSubcategory"]').click(Modmin.addSubcategory)
+    $('[data-action="editCategory"]').click(Modmin.editCategory)
+    $('[data-action="addGroup"]').click(Modmin.addGroup)
+
+    Modmin.exposeAssumedPrivileges()
+  }
+
+  Modmin.refreshPrivilegeTable = function () {
+    socket.emit('plugins.modmin.categories.getPrivilegeSettings', {cid: parseInt(cid, 10)}, function (err, privileges) {
+      if (err) {
+        return app.alertError(err.message)
+      }
+      let tpl = cid ? 'admin/partials/categories/privileges' : 'admin/partials/global/privileges'
+      Benchpress.parse(tpl, {
+        privileges: privileges,
+      }, function (html) {
+        translator.translate(html, function (html) {
+          $('.privilege-table-container').html(html)
+          Modmin.exposeAssumedPrivileges()
+        })
+      })
+    })
+  }
+
+  function handlePrivChanges() {
     $('.privilege-table-container').on('change', 'input[type="checkbox"]', function () {
       let checkboxEl = $(this)
       let privilege = checkboxEl.parent().attr('data-privilege')
@@ -54,29 +81,6 @@ define('forum/modmin/category', [
     $('.privilege-table-container').on('click', '[data-action="search.group"]', Modmin.addGroupToPrivilegeTable)
     $('.privilege-table-container').on('click', '[data-action="copyToChildren"]', Modmin.copyPrivilegesToChildren)
     $('.privilege-table-container').on('click', '[data-action="copyPrivilegesFrom"]', Modmin.copyPrivilegesFromCategory)
-
-    $('[data-action="addSubcategory"]').click(Modmin.addSubcategory)
-    $('[data-action="editCategory"]').click(Modmin.editCategory)
-    $('[data-action="addGroup"]').click(Modmin.addGroup)
-
-    Modmin.exposeAssumedPrivileges()
-  }
-
-  Modmin.refreshPrivilegeTable = function () {
-    socket.emit('plugins.modmin.categories.getPrivilegeSettings', {cid: parseInt(cid, 10)}, function (err, privileges) {
-      if (err) {
-        return app.alertError(err.message)
-      }
-      let tpl = cid ? 'admin/partials/categories/privileges' : 'admin/partials/global/privileges'
-      Benchpress.parse(tpl, {
-        privileges: privileges,
-      }, function (html) {
-        translator.translate(html, function (html) {
-          $('.privilege-table-container').html(html)
-          Modmin.exposeAssumedPrivileges()
-        })
-      })
-    })
   }
 
   Modmin.exposeAssumedPrivileges = function () {
@@ -109,12 +113,14 @@ define('forum/modmin/category', [
       member: member,
     }, function (err) {
       if (err) {
-        Modmin.refreshPrivilegeTable()
+        // Modmin.refreshPrivilegeTable()
+        ajaxify.refresh()
         return app.alertError(err.message)
       }
 
       checkboxEl.replaceWith('<i class="fa fa-spin fa-spinner"></i>')
-      Modmin.refreshPrivilegeTable()
+      // Modmin.refreshPrivilegeTable()
+      ajaxify.refresh()
     })
   }
 
@@ -140,8 +146,9 @@ define('forum/modmin/category', [
             return app.alertError(err.message)
           }
 
-          Modmin.refreshPrivilegeTable()
           modal.modal('hide')
+          // Modmin.refreshPrivilegeTable()
+          ajaxify.refresh()
         })
       })
     })
@@ -169,8 +176,9 @@ define('forum/modmin/category', [
             return app.alertError(err.message)
           }
 
-          Modmin.refreshPrivilegeTable()
           modal.modal('hide')
+          // Modmin.refreshPrivilegeTable()
+          ajaxify.refresh()
         })
       })
     })
@@ -328,18 +336,15 @@ define('forum/modmin/category', [
   }
 
   Modmin.addGroup = function () {
-    bootbox.prompt('Group Name', (name) => {
-      socket.emit('plugins.modmin.categories.addGroup', {
-        cid,
-        name,
-      }, (err) => {
-        if (err) {
-          app.alertError(err.message)
-        } else {
-          app.alertSuccess('[[modmin:group_created]]')
-          ajaxify.refresh()
-        }
-      })
+    socket.emit('plugins.modmin.categories.addGroup', {
+      cid,
+    }, (err) => {
+      if (err) {
+        app.alertError(err.message)
+      } else {
+        app.alertSuccess('[[modmin:group_owned]]')
+        ajaxify.refresh()
+      }
     })
   }
 
