@@ -23,9 +23,9 @@
 								</th>
 							</tr><tr><!-- zebrastripe reset --></tr>
 							<tr>
-								<!-- BEGIN userPrivilegesLabels -->
-								<th class="text-center">{userPrivilegesLabels.name}</th>
-								<!-- END userPrivilegesLabels -->
+								<!-- BEGIN PrivilegesLabels -->
+								<th class="text-center">{PrivilegesLabels.name}</th>
+								<!-- END PrivilegesLabels -->
 							</tr>
 						</thead>
 						<tbody>
@@ -35,6 +35,36 @@
 									<input type="checkbox" data-key="@value">
 								</td>
                 <!-- END userPrivileges -->
+							</tr>
+						</tbody>
+				</table>
+				<h1
+						<thead>
+							<tr class="privilege-table-header">
+								<th colspan="2"></th>
+								<th class="arrowed" colspan="3">
+									[[admin/manage/categories:privileges.section-viewing]]
+								</th>
+								<th class="arrowed" colspan="9">
+									[[admin/manage/categories:privileges.section-posting]]
+								</th>
+								<th class="arrowed" colspan="3">
+									[[admin/manage/categories:privileges.section-moderation]]
+								</th>
+							</tr><tr><!-- zebrastripe reset --></tr>
+							<tr>
+								<!-- BEGIN PrivilegesLabels -->
+								<th class="text-center">{PrivilegesLabels.name}</th>
+								<!-- END PrivilegesLabels -->
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+                <!-- BEGIN groupPrivileges -->
+								<td>
+									<input type="checkbox" data-key="@value">
+								</td>
+                <!-- END groupPrivileges -->
 							</tr>
 						</tbody>
         </table>

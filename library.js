@@ -130,6 +130,15 @@ exports.load = function ({ app, middleware, router }, next) {
                 })
               }
             })
+            
+            Privileges.groupPrivilegeList.slice().reverse().forEach((priv, i) => {
+              if (priv === 'moderate') return
+              if (!settings.get(priv)) {
+                data.privileges.labels.groups.splice(Privileges.groupPrivilegeList.indexOf(priv), 1)
+                  delete data.privileges.groups.privileges[priv]
+              }
+            })
+            
 
             // Assign groups is admin only.
             data.privileges.labels.users.splice(data.privileges.labels.users.indexOf('assigngroups'), 1)
@@ -154,16 +163,15 @@ exports.load = function ({ app, middleware, router }, next) {
   // Config page.
   function renderConfig (req, res, next) {
     let userPrivileges = Privileges.userPrivilegeList.slice()
-    let userPrivilegesLabels = Privileges.privilegeLabels.slice()
-
+    let PrivilegesLabels = Privileges.privilegeLabels.slice()
+    let groupPrivilegeList = Privileges.groupPrivilegeList.slice()
     userPrivileges.pop()
     userPrivilegesLabels.pop()
-
+    groupPrivilegeList.pop()
     res.render('modmin/config', {
       userPrivileges,
-      userPrivilegesLabels,
-      groupPrivilegeList: {},
-      groupPrivilegeListLabels: {},
+      PrivilegesLabels,
+      groupPrivilegeList
     })
   }
 
@@ -217,8 +225,8 @@ exports.load = function ({ app, middleware, router }, next) {
 
     if (!data) return callback(new Error('[[error:invalid-data]]'))
 
-    // Modmins can't modify groups privileges.
-    if (!(parseInt(data.member, 10) && parseInt(data.member, 10)+'' === data.member+'')) return callback(new Error('[[error:not-authorized]]'))
+    // Modmins can modify groups privileges :)
+    // if (!(parseInt(data.member, 10) && parseInt(data.member, 10)+'' === data.member+'')) return callback(new Error('[[error:not-authorized]]'))
 
     // Modmins can't set global privileges.
     if (!cid) return callback(new Error('[[error:not-authorized]]'))

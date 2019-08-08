@@ -1,6 +1,7 @@
 {
   "title": "Zarządzaj Kategorią",
   "intro": "Na tej stronie możesz konfigurować uprawnienia i ustawienia kategorii. Uprawnienia mogą być przyznawane dla użytkowników lub grup. Wybierz kategorię z menu poniżej.",
+  "groups": "Zarządzanie uprawnieniami grup",
   "edit_category": "Edytuj Kategorię",
   "new_subcategory": "Stwórz Podkategorię",
   "category_icon": "Obrazek Kategorii",
