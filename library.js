@@ -233,8 +233,8 @@ exports.load = function ({ app, middleware, router }, next) {
 
     if (!data) return callback(new Error('[[error:invalid-data]]'))
 
-    // Modmins can modify groups privileges :)
-    // if (!(parseInt(data.member, 10) && parseInt(data.member, 10)+'' === data.member+'')) return callback(new Error('[[error:not-authorized]]'))
+    // Modmins can modify groups privileges, unless the setting is changes :)
+    if (!(parseInt(data.member, 10) && parseInt(data.member, 10)+'' === data.member+'') && !settings.get('manage-groups')) return callback(new Error('[[error:not-authorized]]'))
 
     // Modmins can't set global privileges.
     if (!cid) return callback(new Error('[[error:not-authorized]]'))
