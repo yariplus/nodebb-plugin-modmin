@@ -287,7 +287,7 @@ exports.load = function ({ app, middleware, router }, next) {
     const {uid} = socket
     const {cid} = data
 
-    return callback(new Error('[[error:not-authorized]]'))
+    if (!settings.get('manage-groups')) return callback(new Error('[[error:not-authorized]]'))
 
     async.waterfall([
       function (next) {
@@ -328,7 +328,7 @@ exports.load = function ({ app, middleware, router }, next) {
     const uid = socket.uid
 
     // Don't manage group privileges.
-    return callback(new Error('[[error:not-authorized]]'))
+    if (settings.get('manage-groups')) return callback(new Error('[[error:not-authorized]]'))
 
     async.every([fromCid, toCid], (cid, next) => isAdminOrModmin(cid, uid, next), (err, isAdminOrModmin) => {
       if (err || !isAdminOrModmin) return callback(new Error('[[error:not-authorized]]'))
