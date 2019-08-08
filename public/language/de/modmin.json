@@ -1,14 +1,11 @@
 {
   "title": "Kategorie verwalten",
-  "intro": "You can configure the privileges and settings for categories on this page. Privileges can be granted on a per-user or a per-group basis. Select the category from the dropdown below.",
   "intro": "Auf dieser Seite kannst du Privilegien und Einstellung für Kategorien verwalten. Privilegien können für einzelne Nutzer oder für Gruppen erteilt werden. Wähle die Kategorie aus der Dropdown-Liste.",
   "edit_category": "Kategorie bearbeiten",
   "new_subcategory": "Unterkategorie erstellen",
   "category_icon": "Kategorie Icon",
-  "assign_group": "Assign Group <small>Will make the category only accessable by this group.</small>",
   "assign_group": "Gruppe zuweisen <small>Dadurch wird der Zugang der Kategorie auf Gruppenmitglieder beschränkt.</small>",
   "show_badge": "Abzeiche anzeigen <small>Abzeichen Einstellung für zugewiesene Gruppe.</small>",
-  "assign_owner": "Assign Owner <small>If a user is selected, they will become a manager of the category and group.</small>",
   "assign_owner": "Gruppenadmin zuweisen <small>Der ausgewählte Nutzer kann die Kategorie und Gruppe verwalten.</small>",
   "category_edited": "Kategorie erfolgreich bearbeitet",
   "subcategory_added": "Unterkategorie erstellt",
@@ -19,6 +16,7 @@
   "group_exists": "Gruppe existiert bereits",
   "config_title": "Modmin Settings",
   "config_intro": "Select which privileges Category Managers can edit.",
+  "config_groups": "Gruppen Privilegien verwalten",
   "become_group_owner": "Become Group Owner",
   "group_owned": "You are now the group owner!"
 }

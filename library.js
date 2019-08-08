@@ -130,11 +130,27 @@ exports.load = function ({ app, middleware, router }, next) {
                 })
               }
             })
+            
+            Privileges.groupPrivilegeList.slice().reverse().forEach((priv, i) => {
+              if (priv === 'groups:moderate') return
+              if (!settings.get(priv)) {
+                data.privileges.labels.groups.splice(Privileges.groupPrivilegeList.indexOf(priv), 1)
+                Object.keys(data.privileges.groups).forEach(group => {
+                  delete data.privileges.groups[group].privileges[priv]
+                })
+              }
+            })
+            
 
             // Assign groups is admin only.
             data.privileges.labels.users.splice(data.privileges.labels.users.indexOf('assigngroups'), 1)
             Object.keys(data.privileges.users).forEach(uid => {
               delete data.privileges.users[uid].privileges['assigngroups']
+            })
+            data.privileges.labels.groups.splice(data.privileges.labels.groups.indexOf('assigngroups'), 1)
+            
+            Object.keys(data.privileges.groups).forEach(group => {
+              delete data.privileges.groups[group].privileges['groups:assigngroups']
             })
 
             res.render('modmin/category', {
@@ -144,6 +160,7 @@ exports.load = function ({ app, middleware, router }, next) {
               selectedCategory: data.selected,
               cid,
               isGroupAssigner: isGroupAssigner ? 'true' : '',
+              canManageGroups: !settings.get('manage-groups')
             })
           },
         ], next)
@@ -154,16 +171,15 @@ exports.load = function ({ app, middleware, router }, next) {
   // Config page.
   function renderConfig (req, res, next) {
     let userPrivileges = Privileges.userPrivilegeList.slice()
-    let userPrivilegesLabels = Privileges.privilegeLabels.slice()
-
+    let PrivilegesLabels = Privileges.privilegeLabels.slice()
+    let groupPrivileges = Privileges.groupPrivilegeList.slice()
     userPrivileges.pop()
-    userPrivilegesLabels.pop()
-
+    PrivilegesLabels.pop()
+    groupPrivileges.pop()
     res.render('modmin/config', {
       userPrivileges,
-      userPrivilegesLabels,
-      groupPrivilegeList: {},
-      groupPrivilegeListLabels: {},
+      PrivilegesLabels,
+      groupPrivileges
     })
   }
 
@@ -217,8 +233,8 @@ exports.load = function ({ app, middleware, router }, next) {
 
     if (!data) return callback(new Error('[[error:invalid-data]]'))
 
-    // Modmins can't modify groups privileges.
-    if (!(parseInt(data.member, 10) && parseInt(data.member, 10)+'' === data.member+'')) return callback(new Error('[[error:not-authorized]]'))
+    // Modmins can modify groups privileges :)
+    // if (!(parseInt(data.member, 10) && parseInt(data.member, 10)+'' === data.member+'')) return callback(new Error('[[error:not-authorized]]'))
 
     // Modmins can't set global privileges.
     if (!cid) return callback(new Error('[[error:not-authorized]]'))
