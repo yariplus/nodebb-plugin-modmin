@@ -40,3 +40,10 @@
 		</div>
 	</form>
 </div>
+<!-- IF canManageGroups -->
+<style>
+.privilege-table:nth-child(2){
+	display: none;
+}
+</style>
+<!-- ENDIF canManageGroups -->

@@ -16,6 +16,7 @@
   "group_exists": "Group already exists.",
   "config_title": "Modmin Settings",
   "config_intro": "Select which privileges Category Managers can edit.",
+  "config_groups": "Manage Group Privileges",
   "become_group_owner": "Become Group Owner",
   "group_owned": "You are now the group owner!"
 }
