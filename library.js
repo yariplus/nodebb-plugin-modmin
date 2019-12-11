@@ -97,7 +97,8 @@ exports.load = function ({ app, middleware, router }, next) {
                   },
                   function (categoriesData, next) {
                     categoriesData = Categories.getTree(categoriesData)
-                    Categories.buildForSelectCategories(categoriesData, next)
+                    categoriesData = Categories.buildForSelectCategories(categoriesData)
+                    next(null, categoriesData)
                   },
                 ], next)
               },
