@@ -12,6 +12,7 @@ const Events = require.main.require('./src/events')
 const SocketPlugins = require.main.require('./src/socket.io/plugins')
 const SocketAdmin = require.main.require('./src/socket.io/admin')
 const Settings = require.main.require('./src/settings')
+const events = require.main.require('./src/events')
 
 const defaultPrivileges = [
   'find',
@@ -48,6 +49,7 @@ exports.load = function ({ app, middleware, router }, next) {
     let cid = req.params.cid ? parseInt(req.params.cid, 10) : 0
     let isAdmin
     let isGroupAssigner
+    let canDelete
 
     async.waterfall([
       async.apply(Categories.getAllCidsFromSet, 'categories:cid'),
@@ -78,6 +80,12 @@ exports.load = function ({ app, middleware, router }, next) {
           (next) => {
             isAdminOrGroupAssigner(cid, uid, (err, _isGroupAssigner) => {
               isGroupAssigner = _isGroupAssigner
+              next()
+            })
+          },
+          (next) => {
+            isAdminOrCanDelete(cid, uid, (err, _canDelete) => {
+              canDelete = _canDelete
               next()
             })
           },
@@ -161,6 +169,7 @@ exports.load = function ({ app, middleware, router }, next) {
               selectedCategory: data.selected,
               cid,
               isGroupAssigner: isGroupAssigner ? 'true' : '',
+              canDelete: canDelete ? 'true' : '',
               canManageGroups: !settings.get('manage-groups')
             })
           },
@@ -443,30 +452,71 @@ exports.load = function ({ app, middleware, router }, next) {
     })
   })
 
+  SocketPlugins.modmin.categories.deleteCategory = socketMethod((socket, data, callback) => {
+    const {cid} = data
+    const {uid, ip} = socket
+
+    isAdminOrCanDelete(cid, uid, (err, canDelete) => {
+      if (err) return callback(err)
+      if (!canDelete) return callback(new Error('[[error:not-authorized]]'))
+      if(!settings.get('delete-or-disable')) {
+        async.waterfall([
+          async () => {
+          return await Categories.update({[cid]:{disabled:1}})
+          },
+          async () => {
+            return await Groups.leave('cid:' + cid + ':privileges:modmin', uid)
+          }
+        ], callback)
+      }
+      else {
+        async.waterfall([
+          async () =>  {
+            const name = await Categories.getCategoryField(cid, 'name')
+            return await events.log({
+              type: 'category-purge',
+              uid: uid,
+              ip: ip,
+              cid: cid,
+              name: name,
+            })
+          },
+          async () => {
+            return await Categories.purge(cid, uid)
+          }], callback)
+      }
+
+    })
+  })
+
   next()
 }
 
 exports.addPrivileges = (privileges, next) => {
   privileges.push('modmin')
   privileges.push('assigngroups')
+  privileges.push('deletecategories')
   next(null, privileges)
 }
 
 exports.addPrivilegesHuman = (privileges, next) => {
   privileges.push({name: 'Manage Category'})
   privileges.push({name: 'Assign Groups'})
+  privileges.push({name: "Delete Category"})
   next(null, privileges)
 }
 
 exports.addPrivilegesGroups = (privileges, next) => {
   privileges.push('groups:modmin')
   privileges.push('groups:assigngroups')
+  privileges.push('groups:deletecategories')
   next(null, privileges)
 }
 
 exports.copyPrivilegesFrom = (data, next) => {
   data.privileges.push('modmin')
   data.privileges.push('assigngroups')
+  data.privileges.push('deletecategories')
   next(null, data)
 }
 
@@ -546,4 +596,13 @@ function isAdminOrGroupAssigner (cid, uid, callback) {
       Helpers.isUserAllowedTo('assigngroups', uid, [cid], (err, isAllowed) => next(err, isAllowed ? isAllowed[0] : false))
     },
   }, (err, results) => callback(err, err ? false : results.isAdmin || results.isGroupAssigner))
+}
+
+function isAdminOrCanDelete (cid, uid, callback) {
+  async.parallel({
+    isAdmin(next) { User.isAdministrator(uid, next) },
+    canDelete(next) {
+      Helpers.isUserAllowedTo('deletecategories', uid, [cid], (err, isAllowed) => next(err, isAllowed ? isAllowed[0] : false))
+    },
+  }, (err, results) => callback(err, err ? false : results.isAdmin || results.canDelete))
 }

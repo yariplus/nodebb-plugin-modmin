@@ -3,6 +3,7 @@
   "intro": "Na tej stronie możesz konfigurować uprawnienia i ustawienia kategorii. Uprawnienia mogą być przyznawane dla użytkowników lub grup. Wybierz kategorię z menu poniżej.",
   "edit_category": "Edytuj Kategorię",
   "new_subcategory": "Stwórz Podkategorię",
+  "delete_category": "Usuń Kategorię",
   "category_icon": "Obrazek Kategorii",
   "assign_group": "Przypisz grupę <small>Sprawi, że kategoria będzie dostępna tylko dla tej grupy</small>",
   "show_badge": "Pokaż Etykietę <small>Ustawienia etykiet przypisanych do grupy.</small>",
@@ -18,5 +19,8 @@
   "config_intro": "Wybierz jakie uprawnienia Właściciele Kategorii mogą edytować.",
   "config_groups": "Zarządzanie uprawnieniami grup",
   "become_group_owner": "Stań się Właścicielem Grupy",
-  "group_owned": "Jesteś Właścicielem Grupy!"
+  "group_owned": "Jesteś Właścicielem Grupy!",
+  "config_delete_or_disable": "Usuwaj kategorie zamiast je wyłączać",
+  "category_deleted": "Kategoria Usunięta!",
+  "confirm_deletion": "Czy na pewno chcesz usunąć tę kategorię? Ta akcja może być nieodwracalna!"
 }

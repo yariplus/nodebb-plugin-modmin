@@ -68,7 +68,8 @@
                 <!-- END groupPrivileges -->
 							</tr>
 						</tbody>
-        	</table>
+			</table>
+			<h1><input type="checkbox" data-key="delete-or-disable"> [[modmin:config_delete_or_disable]]</h1>
 			</div>
 		</div>
 	</form>

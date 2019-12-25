@@ -3,6 +3,7 @@
   "intro": "You can configure the privileges and settings for categories on this page. Privileges can be granted on a per-user or a per-group basis. Select the category from the dropdown below.",
   "edit_category": "Edit Category",
   "new_subcategory": "Create Subcategory",
+  "delete_category": "Delete Category",
   "category_icon": "Category Icon",
   "assign_group": "Assign Group <small>Will make the category only accessable by this group.</small>",
   "show_badge": "Show Badge <small>Badge setting for assigned group.</small>",
@@ -18,5 +19,8 @@
   "config_intro": "Select which privileges Category Managers can edit.",
   "config_groups": "Manage Group Privileges",
   "become_group_owner": "Become Group Owner",
-  "group_owned": "You are now the group owner!"
+  "group_owned": "You are now the group owner!",
+  "config_delete_or_disable": "Delete categories instead of disabling them",
+  "category_deleted": "Category deleted!",
+  "confirm_deletion": "Are you sure you want to delete this category? This action might be irreversible"
 }

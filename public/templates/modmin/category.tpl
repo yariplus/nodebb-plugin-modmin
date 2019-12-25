@@ -25,7 +25,14 @@
 
         <button type="button" class="btn btn-primary" data-ajaxify="false" data-action="addSubcategory" data-isGroupAssigner="{isGroupAssigner}">
           [[modmin:new_subcategory]]
-        </button>
+		</button>
+		
+		<!-- IF canDelete -->
+		<button type="button" class="btn btn-danger" data-ajaxify="false" data-action="deleteCategory">
+			[[modmin:delete_category]]
+		</button>
+		<!-- ENDIF canDelete -->
+
       </div>
 
       <hr />
