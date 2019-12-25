@@ -26,5 +26,6 @@
     { "hook": "filter:admin.header.build",                  "method": "adminHeader" }
   ],
   "templates": "public/templates",
-  "languages": "public/language"
+  "languages": "public/language",
+  "defaultLang": "en_US"
 }
