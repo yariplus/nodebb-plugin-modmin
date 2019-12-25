@@ -29,7 +29,7 @@ define('forum/modmin/category', [
     $('[data-action="addSubcategory"]').click(Modmin.addSubcategory)
     $('[data-action="editCategory"]').click(Modmin.editCategory)
     $('[data-action="addGroup"]').click(Modmin.addGroup)
-
+    $('[data-action="deleteCategory"]').click(Modmin.deleteCategory)
     Modmin.exposeAssumedPrivileges()
   }
 
@@ -346,6 +346,23 @@ define('forum/modmin/category', [
         ajaxify.refresh()
       }
     })
+  }
+
+  Modmin.deleteCategory = function () {
+    let modal = bootbox.confirm("<div class='h2'>[[modmin:confirm_deletion]]</div>", function (result) {
+      if (!result) return
+      socket.emit('plugins.modmin.categories.deleteCategory', {
+        cid: cid
+      }, (err) => {
+        if (err) {
+          app.alertError(err.message)
+        } else {
+          app.alertSuccess('[[modmin:category_deleted]]')
+          ajaxify.refresh()
+        }
+      })
+    })
+    return modal
   }
 
   return Modmin
