@@ -20,7 +20,7 @@ define('forum/modmin/category', [
       ajaxify.go('modmin/category/' + (cid || ''))
     })
     Modmin.setupPrivilegeTable()
-    if ($(location).attr('hash')=="#addCategory") {
+    if ($(location).attr('hash')=="#addCategory" && cid==0) {
       Modmin.addCategory();
     }
   }
