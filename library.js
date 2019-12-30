@@ -13,6 +13,7 @@ const SocketPlugins = require.main.require('./src/socket.io/plugins')
 const SocketAdmin = require.main.require('./src/socket.io/admin')
 const Settings = require.main.require('./src/settings')
 const events = require.main.require('./src/events')
+const notifications = require.main.require('./src/notifications')
 
 const defaultPrivileges = [
   'find',
@@ -170,7 +171,9 @@ exports.load = function ({ app, middleware, router }, next) {
               cid,
               isGroupAssigner: isGroupAssigner ? 'true' : '',
               canDelete: canDelete ? 'true' : '',
-              canManageGroups: !settings.get('manage-groups')
+              canManageGroups: !settings.get('manage-groups'),
+              isGlobal: cid==0 ? 'true' : '',
+              forceOwner: (!settings.get('force-owner') || isGroupAssigner || cid!=0) ? '' : 'true',
             })
           },
         ], next)
@@ -487,6 +490,107 @@ exports.load = function ({ app, middleware, router }, next) {
       }
 
     })
+  })
+
+  SocketPlugins.modmin.categories.addCategory = socketMethod((socket, data, callback) => {
+    const uid = socket.uid
+    let category = {}
+
+    let fields = data.data
+    let owner = !!data.owner ? data.owner : data.uid
+    let userTitleEnabled = data.userTitleEnabled ? 1 : 0
+    let group = data.group ? 1 : 0
+    let rescindDefault = data.rescindDefault ? 1 : 0
+    async.waterfall([
+      async.apply(Categories.create, fields),
+      (_category, next) => {
+        category = _category
+        group = group ? category.name : false
+
+        // Don't copy privs
+        next()
+
+      },
+      (next) => {
+        let isAdmin = false
+        User.isAdminOrGlobalMod(uid, (err, result) => {
+          if(!err) {
+            isAdmin = result
+          }
+        })
+        if (!isAdmin && settings.get('disable-on-creation')) {
+          notifications.create({
+            type: 'post-queue',
+            bodyShort: `[[modmin:new_category, ${category.name}, ${category.cid}]]`,
+            nid: 'new_category:' + category.name,
+            path: '/admin/manage/categories',
+            mergeId: 'new_category',
+          }, (err, notifObj) => {
+            if(err) {
+              next(err)
+            }
+            else {
+              notifications.pushGroup(notifObj, 'administrators', (err) => {
+                if (err) {
+                  next(err)
+                }
+                else {
+                  Categories.update({[category.cid]:{disabled:1}}, (err) => {
+                    if (err) {
+                      next(err)
+                    }
+                    else {
+                      next()
+                    }
+                  })
+                }
+              })
+            }
+          });
+          
+        }
+        else {
+          next()
+        }
+      },
+      (next) => {
+        if (!owner) {
+          async.parallel([
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', uid),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', uid),
+          ], err => next(err))
+        } else {
+          async.parallel([
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', owner),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', owner),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', uid),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', uid),
+          ], err => next(err))
+        }
+      },
+      (next) => {
+        isAdminOrGroupAssigner(0, uid, (err, isGroupAssigner) => {
+          if (err) return next(err)
+          if (!isGroupAssigner) {
+            if (!settings.get('force-group')) {
+              return next()
+            }
+            group = category.name
+            userTitleEnabled = !!settings.get('force-group-title')
+            if (!settings.get('force-owner')) {
+              owner = uid
+            }
+            rescindDefault = settings.get('rescind-defaults')
+          }
+          async.parallel([
+            async.apply(Groups.create, {name: group, ownerUid: owner || uid, userTitleEnabled}),
+            async.apply(Privileges.categories.give, defaultPrivileges, [category.cid], [group]),
+            async.apply(Privileges.categories.rescind, defaultPrivileges, [category.cid], rescindDefault ? ['registered-users', 'guests', 'spiders'] : []),
+            async.apply(Database.setObjectField, 'modmin:cid:group', `${category.cid}`, group),
+          ], (err) => next(err))
+        })
+      }
+    ], (err) => callback(err, {cid:category.cid, disabled:settings.get('disable-on-creation')}))
   })
 
   next()

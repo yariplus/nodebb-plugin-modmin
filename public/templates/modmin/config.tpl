@@ -70,6 +70,12 @@
 						</tbody>
 			</table>
 			<h1><input type="checkbox" data-key="delete-or-disable"> [[modmin:config_delete_or_disable]]</h1>
+			<h1>[[modmin:config_global_settings]]</h1>
+			<h5><input type="checkbox" data-key="disable-on-creation"> [[modmin:config_disable_on_creation]]</h5>
+			<h5><input type="checkbox" data-key="force-group"> [[modmin:config_force_group]]</h5>
+			<h5><input type="checkbox" data-key="force-group-title"> [[modmin:config_force_group_title]]</h5>
+			<h5><input type="checkbox" data-key="rescind-defaults"> [[modmin:config_rescind_defaults]]</h5>
+			<h5><input type="checkbox" data-key="force-owner"> [[modmin:config_force_owner]]</h5>
 			</div>
 		</div>
 	</form>

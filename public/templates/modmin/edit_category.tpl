@@ -45,12 +45,14 @@
       </div>
     </div>
     <!-- ENDIF isGroupAssigner -->
+    <!-- IF !forceOwner -->
     <div class="col-sm-6 col-xs-12">
       <div class="form-group">
         <label for="category-owner">[[modmin:assign_owner]]</label>
         <input id="category-owner" type="text" placeholder="" data-name="color" class="form-control category_color" />
       </div>
     </div>
+    <!-- ENDIF !forceOwner -->
     <!-- ENDIF addSubcategory -->
   </div>
 </form>

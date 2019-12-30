@@ -13,6 +13,12 @@
 			<hr />
 
       <div class="btn-toolbar">
+		<!-- IF isGlobal -->
+		<button type="button" class="btn btn-info" data-ajaxify="false" data-action="addCategory" data-isGroupAssigner="{isGroupAssigner}" data-forceOwner="{forceOwner}">
+			[[modmin:add_category]]
+		</button>
+
+		<!-- ELSE -->
         <button type="button" class="btn btn-info" data-ajaxify="false" data-action="editCategory">
           [[modmin:edit_category]]
         </button>
@@ -33,6 +39,7 @@
 		</button>
 		<!-- ENDIF canDelete -->
 
+		<!-- ENDIF isGlobal -->
       </div>
 
       <hr />
