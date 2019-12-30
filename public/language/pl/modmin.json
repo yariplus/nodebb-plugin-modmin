@@ -22,5 +22,15 @@
   "group_owned": "Jesteś Właścicielem Grupy!",
   "config_delete_or_disable": "Usuwaj kategorie zamiast je wyłączać",
   "category_deleted": "Kategoria Usunięta!",
-  "confirm_deletion": "Czy na pewno chcesz usunąć tę kategorię? Ta akcja może być nieodwracalna!"
+  "confirm_deletion": "Czy na pewno chcesz usunąć tę kategorię? Ta akcja może być nieodwracalna!",
+  "config_global_settings": "Ustawienia tworzenia kategorii globalnych",
+  "config_disable_on_creation": "Wyłącz po utworzeniu i powiadom administratora <small>Nie dotyczy administratorów i globalnych moderatorów</small>",
+  "config_force_group": "Zawsze twórz grupę <small>Nie dotyczy administratorów i użytkowników z globalnym uprawnieniem Assign Groups</small>",
+  "config_force_group_title": "Zawsze pokazuj etykietę grupy <small>Nie dotyczy administratorów i użytkowników z globalnym uprawnieniem Assign Groups</small>",
+  "config_rescind_defaults": "Usuń domyślne uprawnienia <small>Zabierz dostęp domyślnym grupom - registered-users, guests i spiders</small>",
+  "config_force_owner": "Nie pozwól na wybranie innego właściciela grupy <small>Nie dotyczy administratorów i użytkowników z globalnym uprawnieniem Assign Groups</small>",
+  "add_category": "Stwórz Kategorię",
+  "category_added": "Kategoria Dodana!",
+  "awaiting_approval": "Oczekuje obecnie na akceprację przez administratora.",
+  "new_category": "Nowa kategoria %1 (id: %2) oczekuje na weryfikację"
 }
