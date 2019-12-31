@@ -380,12 +380,15 @@ exports.load = function ({ app, middleware, router }, next) {
           async.parallel([
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', uid),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', uid),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:deletecategories', uid),
           ], err => next(err))
         } else {
           async.parallel([
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', owner),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', owner),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:deletecategories', owner),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', uid),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:deletecategories', uid),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', uid),
           ], err => next(err))
         }
@@ -558,13 +561,16 @@ exports.load = function ({ app, middleware, router }, next) {
           async.parallel([
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', uid),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', uid),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:deletecategories', uid),
           ], err => next(err))
         } else {
           async.parallel([
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', owner),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', owner),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:deletecategories', owner),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:modmin', uid),
             async.apply(Groups.join, 'cid:' + category.cid + ':privileges:moderate', uid),
+            async.apply(Groups.join, 'cid:' + category.cid + ':privileges:deletecategories', uid),
           ], err => next(err))
         }
       },
