@@ -3,6 +3,7 @@
   "intro": "You can configure the privileges and settings for categories on this page. Privileges can be granted on a per-user or a per-group basis. Select the category from the dropdown below.",
   "edit_category": "Edit Category",
   "new_subcategory": "Create Subcategory",
+  "delete_category": "Delete Category",
   "category_icon": "Category Icon",
   "assign_group": "Assign Group <small>Will make the category only accessable by this group.</small>",
   "show_badge": "Show Badge <small>Badge setting for assigned group.</small>",
@@ -18,5 +19,18 @@
   "config_intro": "Select which privileges Category Managers can edit.",
   "config_groups": "Manage Group Privileges",
   "become_group_owner": "Become Group Owner",
-  "group_owned": "You are now the group owner!"
+  "group_owned": "You are now the group owner!",
+  "config_delete_or_disable": "Delete categories instead of disabling them",
+  "category_deleted": "Category deleted!",
+  "confirm_deletion": "Are you sure you want to delete this category? This action might be irreversible",
+  "config_global_settings": "Global category creation settings",
+  "config_disable_on_creation": "Disable on creation and notify an administrator <small>Doesn't affect administrators and global moderators</small>",
+  "force_group": "Assign group <small>Doesn't affect administrators and users with Assign Groups global privilege</small>",
+  "config_force_group_title": "Show badge <small>Doesn't affect administrators and users with Assign Groups global privilege</small>",
+  "config_rescind_defaults": "Rescind default privileges <small>Make the categori inaccessible to default groups - registered-users, guests and spiders</small>",
+  "config_force_owner": "Don't allow for owner selection <small>Doesn't affect administrators and users with Assign Groups global privilege</small>",
+  "add_category": "Create Category",
+  "category_added": "Category Added!",
+  "awaiting_approval": "It's currently waiting for administrator approval.",
+  "new_category": "New category %1 (id: %2) is awaiting verification"
 }

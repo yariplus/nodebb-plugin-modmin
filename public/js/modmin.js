@@ -19,8 +19,10 @@ define('forum/modmin/category', [
       let cid = parseInt(category.cid, 10)
       ajaxify.go('modmin/category/' + (cid || ''))
     })
-
     Modmin.setupPrivilegeTable()
+    if ($(location).attr('hash')=="#addCategory" && cid==0) {
+      Modmin.addCategory();
+    }
   }
 
   Modmin.setupPrivilegeTable = function () {
@@ -29,7 +31,8 @@ define('forum/modmin/category', [
     $('[data-action="addSubcategory"]').click(Modmin.addSubcategory)
     $('[data-action="editCategory"]').click(Modmin.editCategory)
     $('[data-action="addGroup"]').click(Modmin.addGroup)
-
+    $('[data-action="deleteCategory"]').click(Modmin.deleteCategory)
+    $('[data-action="addCategory"]').click(Modmin.addCategory)
     Modmin.exposeAssumedPrivileges()
   }
 
@@ -231,6 +234,36 @@ define('forum/modmin/category', [
     })
   }
 
+  Modmin.addCategory = function () {
+    Benchpress.parse('modmin/edit_category', {
+      addSubcategory: true,
+      isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
+      forceOwner: !!$('[data-forceOwner="true"]').length,
+    }, function (html) {
+      translator.translate(html, function (html) {
+        let modal = showCategoryModal('[[modmin:add_category]]', 'addCategory', html, function (err, data) {
+          if (err) return app.alertError(err.message)
+          app.alertSuccess('[[modmin:category_added]]'+ (!!data.disabled ? ' [[modmin:awaiting_approval]]' : ''))
+          ajaxify.refresh()
+        })
+
+        modal.on('shown.bs.modal', function () {
+          modal.find('#category-color').val('#ec0000')
+          modal.find('#category-bgColor').val('#ffffff')
+          modal.find('#category-group').prop('checked', true)
+          modal.find('#category-badge').prop('checked', true)
+
+          autocomplete.user(modal.find('#category-owner'))
+          modal.find('#category-icon i').addClass('fa-group')
+          .prop('value', 'fa-group')
+          modal.find('#category-icon').click(() => {
+            iconSelect.init($(this).find('i'), (el) => {})
+          })
+        })
+      })
+    })
+  }
+
   Modmin.editCategory = function () {
     if (!cid) return
 
@@ -346,6 +379,23 @@ define('forum/modmin/category', [
         ajaxify.refresh()
       }
     })
+  }
+
+  Modmin.deleteCategory = function () {
+    let modal = bootbox.confirm("<div class='h2'>[[modmin:confirm_deletion]]</div>", function (result) {
+      if (!result) return
+      socket.emit('plugins.modmin.categories.deleteCategory', {
+        cid: cid
+      }, (err) => {
+        if (err) {
+          app.alertError(err.message)
+        } else {
+          app.alertSuccess('[[modmin:category_deleted]]')
+          ajaxify.refresh()
+        }
+      })
+    })
+    return modal
   }
 
   return Modmin
