@@ -1,7 +1,9 @@
 .ui-front.ui-autocomplete {
   z-index: 100002;
 }
-
+.modal.in[aria-labelledby="upload-file"] {
+  z-index: 100003;
+}
 #category-color[type="color"], #category-bgColor[type="color"] {
   padding: 0;
 }
@@ -20,4 +22,20 @@
   .privilege-table-header, .help-block {
     display: none;
   }
+}
+.category-preview {
+	.pointer;
+	width: 100%;
+	height: 100px;
+	text-align: center;
+	color: white;
+	margin-top: 0;
+
+	.icon {
+		width: 30px;
+		height: 30px;
+		line-height: 40px;
+		display: inline-block;
+		margin: 35px 5px 0 5px;
+	}
 }
