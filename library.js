@@ -2,8 +2,6 @@
 
 const async = require('async')
 const multipart = require('connect-multiparty')
-const path = require('path')
-const nconf = require('nconf');
 
 const User = require.main.require('./src/user')
 const Privileges = require.main.require('./src/privileges')
@@ -17,10 +15,7 @@ const SocketAdmin = require.main.require('./src/socket.io/admin')
 const Settings = require.main.require('./src/settings')
 const events = require.main.require('./src/events')
 const notifications = require.main.require('./src/notifications')
-const file = require.main.require('./src/file')
-const image = require.main.require('./src/image')
-const plugins = require.main.require('./src/plugins')
-const meta = require.main.require('./src/meta');
+const controllers = require.main.require('./src/controllers')
 
 const defaultPrivileges = [
   'find',
@@ -205,21 +200,19 @@ exports.load = function ({ app, middleware, router }, next) {
     })
   }
   async function uploadCategoryPicture (req, res, next) {
-    const uploadedFile = req.files.files[0];
-    let params = null;
     try {
-      params = JSON.parse(req.body.params);
+      const params = JSON.parse(req.body.params);
+      const isUserAllowedTo = await Helpers.isUserAllowedTo('modmin', req.uid, [params.cid])
+      if (isUserAllowedTo) {
+        return await controllers.admin.uploads.uploadCategoryPicture(req, res, next)
+      }
+      else {
+        return next(new Error('[[error:not-authorized]]'));
+      }
     } catch (e) {
-      file.delete(uploadedFile.path);
       return next(new Error('[[error:invalid-json]]'));
     }
     
-    const isUserAllowedTo = await Helpers.isUserAllowedTo('modmin', req.uid, [params.cid])
-    if (isUserAllowedTo && typeof params.cid === "number" && validateUpload(res, uploadedFile, allowedImageTypes)) {
-      console.log("file is valid and user can modify category")
-      const filename = 'category-' + params.cid + path.extname(uploadedFile.name);
-      await uploadImage(filename, 'category', uploadedFile, req, res, next);
-    }
   }
   // All possible routes.
   router.get('/modmin', middleware.buildHeader, render)
@@ -744,51 +737,4 @@ function isAdminOrCanDelete (cid, uid, callback) {
       Helpers.isUserAllowedTo('deletecategories', uid, [cid], (err, isAllowed) => next(err, isAllowed ? isAllowed[0] : false))
     },
   }, (err, results) => callback(err, err ? false : results.isAdmin || results.canDelete))
-}
-
-function validateUpload(res, uploadedFile, allowedTypes) {
-  if (!allowedTypes.includes(uploadedFile.type)) {
-    file.delete(uploadedFile.path);
-    res.json({ error: '[[error:invalid-image-type, ' + allowedTypes.join('&#44; ') + ']]' });
-    return false;
-  }
-
-  return true;
-}
-
-async function uploadImage(filename, folder, uploadedFile, req, res, next) {
-	let imageData;
-	try {
-		if (plugins.hasListeners('filter:uploadImage')) {
-			imageData = await plugins.fireHook('filter:uploadImage', { image: uploadedFile, uid: req.uid });
-		} else {
-			imageData = await file.saveFileToLocal(filename, folder, uploadedFile.path);
-		}
-
-		if (path.basename(filename, path.extname(filename)) === 'site-logo' && folder === 'system') {
-			const uploadPath = path.join(nconf.get('upload_path'), folder, 'site-logo-x50.png');
-			await image.resizeImage({
-				path: uploadedFile.path,
-				target: uploadPath,
-				height: 50,
-			});
-			await meta.configs.set('brand:emailLogo', path.join(nconf.get('upload_url'), 'system/site-logo-x50.png'));
-			const size = await image.size(uploadedFile.path);
-			await meta.configs.setMultiple({
-				'brand:logo:width': size.width,
-				'brand:logo:height': size.height,
-			});
-		} else if (path.basename(filename, path.extname(filename)) === 'og:image' && folder === 'system') {
-			const size = await image.size(uploadedFile.path);
-			await meta.configs.setMultiple({
-				'og:image:width': size.width,
-				'og:image:height': size.height,
-			});
-		}
-		res.json([{ name: uploadedFile.name, url: imageData.url.startsWith('http') ? imageData.url : nconf.get('relative_path') + imageData.url }]);
-	} catch (err) {
-		next(err);
-	} finally {
-		file.delete(uploadedFile.path);
-	}
 }
