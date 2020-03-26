@@ -209,6 +209,7 @@ define('forum/modmin/category', [
     Benchpress.parse('modmin/edit_category', {
       addSubcategory: true,
       isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
+      category: false
     }, function (html) {
       translator.translate(html, function (html) {
         let modal = showCategoryModal('[[modmin:new_subcategory]]', 'addSubcategory', html, function (err, cid) {
@@ -239,6 +240,7 @@ define('forum/modmin/category', [
       addSubcategory: true,
       isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
       forceOwner: !!$('[data-forceOwner="true"]').length,
+      category: false
     }, function (html) {
       translator.translate(html, function (html) {
         let modal = showCategoryModal('[[modmin:add_category]]', 'addCategory', html, function (err, data) {

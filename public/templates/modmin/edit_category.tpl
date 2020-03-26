@@ -23,15 +23,13 @@
     <div class="col-sm-6 col-xs-12">
       <div class="form-group">
         <label for="category-icon">[[modmin:category_icon]]</label>
-        <div id="category-icon" class="category-preview" style="<!-- IF category -->
+        <div id="category-icon" class="category-preview" style="{{{if category }}}
 						<!-- IF category.backgroundImage -->background-image: url({category.backgroundImage});<!-- ENDIF category.backgroundImage -->
 						<!-- IF category.bgColor -->background-color: {category.bgColor};<!-- ENDIF category.bgColor -->
 						<!-- IF category.imageClass -->background-size: {category.imageClass};<!-- ENDIF category.imageClass -->
-            color: {category.color};
-            <!-- ENDIF category-->
-					">
-						<div class="icon">
-              <i id="icon" data-name="icon" value="{category.icon}" class="fa {category.icon} fa-2x"></i>
+            color: {category.color}  {{{end category }}}">
+						<div class="icon" >
+              <i id="icon" data-name="icon" value="{{{if category }}} {category.icon} {{{end }}}" class="fa {{{if category }}} {category.icon} {{{else }}} fa-fw {{{endif }}} fa-2x"></i>
             </div>
           </div>
           <!-- IF category -->
@@ -61,7 +59,7 @@
               <option value="cover">cover</option>
               <option value="contain">contain</option>
             </select>
-          </div>
+          </div>          
           <!-- ENDIF category -->
       </div>
     </div>
