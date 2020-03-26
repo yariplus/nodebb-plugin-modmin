@@ -223,12 +223,16 @@ define('forum/modmin/category', [
           modal.find('#category-bgColor').val('#ffffff')
           modal.find('#category-group').prop('checked', true)
           modal.find('#category-badge').prop('checked', true)
+          modal.find('#category-icon').css("background-color", "#ffffff")
 
           autocomplete.user(modal.find('#category-owner'))
           modal.find('#category-icon i').addClass('fa-group')
           .prop('value', 'fa-group')
           modal.find('#category-icon').click(() => {
             iconSelect.init($(this).find('i#icon'), (el) => {})
+          })
+          modal.find('#category-bgColor').on('change', function (e) {
+            $('#category-icon').css('background-color', e.target.value)
           })
         })
       })
@@ -254,12 +258,16 @@ define('forum/modmin/category', [
           modal.find('#category-bgColor').val('#ffffff')
           modal.find('#category-group').prop('checked', true)
           modal.find('#category-badge').prop('checked', true)
+          modal.find('#category-icon').css("background-color", "#ffffff")
 
           autocomplete.user(modal.find('#category-owner'))
           modal.find('#category-icon i').addClass('fa-group')
           .prop('value', 'fa-group')
           modal.find('#category-icon').click(() => {
             iconSelect.init($(this).find('i#icon'), (el) => {})
+          })
+          modal.find('#category-bgColor').on('change', function (e) {
+            $('#category-icon').css('background-color', e.target.value)
           })
         })
       })
@@ -313,6 +321,9 @@ define('forum/modmin/category', [
           modal.find('[data-name="imageClass"]').on('change', function () {
             $('.category-preview').css('background-size', $(this).val());
           });
+          modal.find('#category-bgColor').on('change', function (e) {
+            $('#category-icon').css('background-color', e.target.value)
+          })
         })
       })
     })
