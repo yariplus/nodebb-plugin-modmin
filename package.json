@@ -1,14 +1,36 @@
 {
-  "name": "nodebb-plugin-modmin",
-  "version": "1.4.0",
+  "_from": "git+https://github.com/oplik0/nodebb-plugin-modmin.git#category-pictures",
+  "_id": "nodebb-plugin-modmin@1.4.0",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/nodebb-plugin-modmin",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "https://github.com/oplik0/nodebb-plugin-modmin#category-pictures",
+    "rawSpec": "https://github.com/oplik0/nodebb-plugin-modmin#category-pictures",
+    "saveSpec": "git+https://github.com/oplik0/nodebb-plugin-modmin.git#category-pictures",
+    "fetchSpec": "https://github.com/oplik0/nodebb-plugin-modmin.git",
+    "gitCommittish": "category-pictures"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://github.com/oplik0/nodebb-plugin-modmin.git#bc4c8c7c740502f6f29b7bc54bb445e45ea35a76",
+  "_spec": "https://github.com/oplik0/nodebb-plugin-modmin#category-pictures",
+  "_where": "C:\\Users\\oplik\\Documents\\GitHub\\NodeBB",
   "author": {
     "name": "yariplus",
     "email": "tafike@gmail.com"
   },
-  "homepage": "https://github.com/yariplus/nodebb-plugin-modmin",
   "bugs": {
     "url": "https://github.com/yariplus/nodebb-plugin-modmin/issues"
   },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "This project was created thanks to support from [Linksjugend ['solid] Hamburg](https://linksjugend-hamburg.de/), represented by Artur Leier and Tom R.",
+  "homepage": "https://github.com/yariplus/nodebb-plugin-modmin",
   "keywords": [
     "nodebb",
     "plugin",
@@ -16,7 +38,9 @@
     "moderator",
     "admin"
   ],
+  "name": "nodebb-plugin-modmin",
   "nbbpm": {
     "compatibility": "^1.13.0"
-  }
+  },
+  "version": "1.4.0"
 }
