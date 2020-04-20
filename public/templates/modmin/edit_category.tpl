@@ -23,9 +23,44 @@
     <div class="col-sm-6 col-xs-12">
       <div class="form-group">
         <label for="category-icon">[[modmin:category_icon]]</label>
-        <div id="category-icon" class="btn btn-default" style="display:block;">
-          <i class="fa fa-fw"></i>
-        </div>
+        <div id="category-icon" class="category-preview" style="{{{if category }}}
+						<!-- IF category.backgroundImage -->background-image: url({category.backgroundImage});<!-- ENDIF category.backgroundImage -->
+						<!-- IF category.bgColor -->background-color: {category.bgColor};<!-- ENDIF category.bgColor -->
+						<!-- IF category.imageClass -->background-size: {category.imageClass};<!-- ENDIF category.imageClass -->
+            color: {category.color}  {{{end category }}}">
+						<div class="icon" >
+              <i id="icon" data-name="icon" value="{{{if category }}} {category.icon} {{{end }}}" class="fa {{{if category }}} {category.icon} {{{else }}} fa-fw {{{endif }}} fa-2x"></i>
+            </div>
+          </div>
+          <!-- IF category -->
+          <div class="btn-group btn-group-justified">
+						<div class="btn-group">
+							<button type="button" data-cid="{category.cid}" class="btn btn-default upload-button">
+								<i class="fa fa-upload"></i>
+								[[admin/manage/categories:upload-image]]
+              </button>
+              <input class="hidden" id="category-image" value="{category.backgroundImage}">
+						</div>
+						<!-- IF category.image -->
+						<div class="btn-group">
+							<button class="btn btn-warning delete-image">
+								<i data-name="icon" value="fa-times" class="fa fa-times"></i>
+								[[admin/manage/categories:delete-image]]
+							</button>
+						</div>
+						<!-- ENDIF category.image -->
+          </div>
+          <div class="form-group">
+            <label for="imageClass">
+              [[admin/manage/categories:bg-image-size]]
+            </label>
+            <select id="imageClass" class="form-control" data-name="imageClass" data-value="{category.imageClass}">
+              <option value="auto">auto</option>
+              <option value="cover">cover</option>
+              <option value="contain">contain</option>
+            </select>
+          </div>          
+          <!-- ENDIF category -->
       </div>
     </div>
     <!-- IF addSubcategory -->

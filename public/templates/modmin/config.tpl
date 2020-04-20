@@ -75,6 +75,7 @@
 			<h5><input type="checkbox" data-key="force-group"> [[modmin:config_force_group]]</h5>
 			<h5><input type="checkbox" data-key="force-group-title"> [[modmin:config_force_group_title]]</h5>
 			<h5><input type="checkbox" data-key="rescind-defaults"> [[modmin:config_rescind_defaults]]</h5>
+			<h5><input type="checkbox" data-key="rescind-defaults-writing"> [[modmin:config_rescind_defaults_writing]]</h5>
 			<h5><input type="checkbox" data-key="force-owner"> [[modmin:config_force_owner]]</h5>
 			</div>
 		</div>

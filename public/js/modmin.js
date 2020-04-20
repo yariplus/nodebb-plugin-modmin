@@ -209,6 +209,7 @@ define('forum/modmin/category', [
     Benchpress.parse('modmin/edit_category', {
       addSubcategory: true,
       isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
+      category: false
     }, function (html) {
       translator.translate(html, function (html) {
         let modal = showCategoryModal('[[modmin:new_subcategory]]', 'addSubcategory', html, function (err, cid) {
@@ -222,12 +223,16 @@ define('forum/modmin/category', [
           modal.find('#category-bgColor').val('#ffffff')
           modal.find('#category-group').prop('checked', true)
           modal.find('#category-badge').prop('checked', true)
+          modal.find('#category-icon').css("background-color", "#ffffff")
 
           autocomplete.user(modal.find('#category-owner'))
           modal.find('#category-icon i').addClass('fa-group')
           .prop('value', 'fa-group')
           modal.find('#category-icon').click(() => {
-            iconSelect.init($(this).find('i'), (el) => {})
+            iconSelect.init($(this).find('i#icon'), (el) => {})
+          })
+          modal.find('#category-bgColor').on('change', function (e) {
+            $('#category-icon').css('background-color', e.target.value)
           })
         })
       })
@@ -239,6 +244,7 @@ define('forum/modmin/category', [
       addSubcategory: true,
       isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
       forceOwner: !!$('[data-forceOwner="true"]').length,
+      category: false
     }, function (html) {
       translator.translate(html, function (html) {
         let modal = showCategoryModal('[[modmin:add_category]]', 'addCategory', html, function (err, data) {
@@ -252,12 +258,16 @@ define('forum/modmin/category', [
           modal.find('#category-bgColor').val('#ffffff')
           modal.find('#category-group').prop('checked', true)
           modal.find('#category-badge').prop('checked', true)
+          modal.find('#category-icon').css("background-color", "#ffffff")
 
           autocomplete.user(modal.find('#category-owner'))
           modal.find('#category-icon i').addClass('fa-group')
           .prop('value', 'fa-group')
           modal.find('#category-icon').click(() => {
-            iconSelect.init($(this).find('i'), (el) => {})
+            iconSelect.init($(this).find('i#icon'), (el) => {})
+          })
+          modal.find('#category-bgColor').on('change', function (e) {
+            $('#category-icon').css('background-color', e.target.value)
           })
         })
       })
@@ -273,6 +283,7 @@ define('forum/modmin/category', [
       Benchpress.parse('modmin/edit_category', {
         addSubcategory: true,
         isGroupAssigner: !!$('[data-isGroupAssigner="true"]').length,
+        category: data
       }, function (html) {
         let modal = showCategoryModal('[[modmin:edit_category]]', 'editCategory', html, function (err) {
           if (err) return app.alertError(err.message)
@@ -285,10 +296,33 @@ define('forum/modmin/category', [
           modal.find('#category-description').val($($.parseHTML(data.description)[0]).text())
           modal.find('#category-color').val(data.color)
           modal.find('#category-bgColor').val(data.bgColor)
-          modal.find('#category-icon i').addClass(data.icon)
-          modal.find('#category-icon i').val(data.icon)
           modal.find('#category-icon').click(() => {
-            iconSelect.init($(this).find('i'), (el) => {})
+            iconSelect.init($(this).find('i#icon'), (el) => {})
+          })
+          modal.find('.upload-button').on('click', function () {
+            var inputEl = $(this);
+            uploader.show({
+              title: '[[admin/manage/categories:alert.upload-image]]',
+              route: config.relative_path + '/api/modmin/uploadpicture',
+              params: { cid: cid },
+            }, function (imageUrlOnServer) {
+              $('#category-image').val(imageUrlOnServer);
+              var previewBox = $('.category-preview');
+              previewBox.css('background', 'url(' + imageUrlOnServer + '?' + new Date().getTime() + ')');
+            });
+          });
+          modal.find('.delete-image').on('click', function (e) {
+            e.preventDefault();
+            var inputEl = $('#category-image');
+            var previewBox = $('.category-preview');
+            inputEl.val('');
+            previewBox.css('background-image', '');
+          });
+          modal.find('[data-name="imageClass"]').on('change', function () {
+            $('.category-preview').css('background-size', $(this).val());
+          });
+          modal.find('#category-bgColor').on('change', function (e) {
+            $('#category-icon').css('background-color', e.target.value)
           })
         })
       })
@@ -319,7 +353,8 @@ define('forum/modmin/category', [
         let userTitleEnabled = modal.find('#category-badge').prop('checked')
         let owner = modal.find('#category-owner').val()
         let icon = modal.find('#category-icon i').val()
-
+        let image = modal.find('#category-image').val()
+        let imageClass = modal.find('#imageClass').val()
         if (owner) {
           $.get(config.relative_path + '/api/user/' + owner)
           .done(function (data, status) {
@@ -359,6 +394,8 @@ define('forum/modmin/category', [
               color: color,
               bgColor: bgColor,
               icon: icon,
+              image: image,
+              imageClass: imageClass,
             },
           }, callback)
         }
